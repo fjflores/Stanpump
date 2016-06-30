@@ -1,0 +1,908 @@
+
+
+
+STANPUMP User's Manual
+ 
+January 15, 1995
+
+Overview:
+
+STANPUMP is a computer program which drives an infusion pump to 
+administer anesthetic drugs according to a three compartment 
+pharmacokinetic model.  STANPUMP is available, at no charge, to 
+interested investigators and anesthesiologists.  You may share the 
+STANPUMP software with any interested persons.  My only request is that 
+any manuscripts based upon work with STANPUMP acknowledge, either in the 
+Methods or following the Discussion, the source of STANPUMP with a 
+statement to the effect that STANPUMP is freely available from the 
+author, Steven L. Shafer, M.D., Anesthesiology Service (112A), PAVAMC, 
+3801 Miranda Ave, Palo Alto, CA. 94304.  Please only include the above 
+reference on published manuscripts as space on abstracts is too precious 
+to waste any on an acknowledgment!
+
+STANPUMP can be instructed to maintain a steady concentration in either 
+the plasma or at the site of drug effect (i.e. the effect site or 
+biophase).  STANPUMP can also be used to administer conventional zero-
+order infusions.  STANPUMP has a simulation mode which allows 
+simulations of virtually any desired infusion regimen, including 
+boluses, constant rate infusions, and infusions to achieve pseudo 
+steady-state in the either the plasma or at the site of drug effect.
+
+STANPUMP runs on any IBM PC compatible computer.  Versions of STANPUMP 
+prior to April, 1990 could not run in the effect mode without at least 
+an 8087 math coprocessor or an 80286 computer.  This has now been 
+changed, and STANPUMP will run satisfactorily in the effect mode on any 
+IBM PC compatible computer. 
+
+Ira Rampil has been kind enough to port STANPUMP to the Macintosh in 
+native MAC code (rather than require Soft-PC to emulate a PC).  The 
+program looks the same as the DOS version, and thus lacks the warm and 
+fuzzy characteristics of MAC programs.  However, it works and even 
+drives the serial ports.  The function keys are replaced by the option 
+key + a number (e.g., "Fn 1 is accessed by hitting Opt+1 as a pair.  The 
+End Key is simply lower case 'e'.
+
+STANPUMP will support delivery of drugs over extended periods of time.  
+STANPUMP has infused drug for sedation in our ICU for periods in excess 
+of 2 weeks.  STANPUMP will stop saving data to the disk and internally 
+if it runs out of space, but this should not affect the clinical 
+performance of the pump.  Thus, there is no upper limit to how long 
+STANPUMP can infuse drugs to a patient.
+
+Pierre Maitre, M.D. and I have implemented Bayesian forecasting in the 
+most recent version of STANPUMP.  The use of Bayesian forecasting with 
+STANPUMP is discussed in a separate section below.
+
+STANPUMP can run in simulation modes, or it can control an infusion pump 
+directly over a serial interface.  When STANPUMP directly controls an 
+infusion pump, STANPUMP becomes a medical device.  As such, it should be 
+used only under the auspices of an appropriate institutional review 
+board as part of an approved experimental protocol.
+
+STANPUMP primarily supports the Harvard Pump 22.  The pump costs about 
+$1800 and is an extremely accurate research pump.  While the Harvard 
+Pump 22 is not approved for human use, it has been my experience that 
+clinical engineering departments are happy to approve it for use within 
+a research protocol.  Harvard Apparatus can be reached at 508-655-7000 
+or 800-272-2775.  You should ask for Diane Gargano, who is familiar with 
+this application.
+
+The Harvard Pump 22 has no battery.  Thus, if the Harvard Pump 22 is 
+momentarily disconnected from AC power during a case the pump will lose 
+it's internal memory.  STANPUMP constantly checks the pump for the 
+volume infused during each update cycle.  When the Harvard Pump 22 loses 
+the contents of its internal memory, STANPUMP computes what the volume 
+infused should have been, and restarts the Harvard Pump 22.
+
+STANPUMP has recently incorporated a driver for the GRASEBY 3400 pump. 
+This pump is not accurate at low infusion rates. At low rates, the 
+Graseby 3400 infuses significantly LESS than it internally calculates. 
+There is no way for the STANPUMP program to correct for this internal 
+error. Users of the Graseby 3400 pump are advised to regularly compare 
+the quantity of drug delivered, as reported on the screen of the 
+STANPUMP program, with the actually amount of drug delivered, based on 
+the syringe volume itself. If these quantities differ, then the 
+predicted concentration maintained by STANPUMP will have an additional 
+source of error.
+
+STANPUMP is easy to operate.  To run the program, just copy it into 
+whatever directory you intend to use, and type "STANPUMP."  Then, answer 
+the questions put forward by the program.  You may find yourself 
+confronted with a choice of pharmacokinetic data sets for any given 
+drug.  Most of the kinetic sets will give reasonable performance.  I 
+have my own preferences, but would prefer to not make global 
+recommendations on specific kinetic sets.
+
+Installation of STANPUMP
+
+To install the program, simply place the diskette in your A drive and 
+type Install.  Install simply creates a directory on your C drive called 
+“STANPUMP” and copies the diskette files to that directory.  See 
+suggestions below if you wish to run STANPUMP under Windows.  In 
+general, we do not recommend running STANPUMP under Windows when it is 
+actually administering drug to patients. Technically it is possible to 
+run STANPUMP under Windows, and we have made considerable effort to make 
+STANPUMP itself robust under Windows.  Nevertheless, the Windows 
+environment is not well suited to real-time “mission critical” 
+applications because of the instability of the operating system itself.
+ 
+Running STANPUMP
+
+To run STANPUMP, simple enter the directory where STANPUMP is saved, and 
+type "STANPUMP."  The program will ask for the following data:
+
+1.	Drug selection:  You will be given a list from which you must 
+select on of the available drugs.  You also have the option of creating 
+an external parameter file (Appendix III), and loading in the drug data 
+from that file.
+
+	For each individual drug, there may be a choice of pharmacokinetic 
+parameters.  Depending on the pharmacokinetic parameter set chosen, you 
+may also be asked about the patient's age, height, or gender.
+
+2.	The patient's weight.
+
+3.	The initial mode (target or bolus/infusion mode).  In target mode, 
+the program will infuse however much drug is required to maintain a 
+desired target in either the plasma or at the site of drug effect.  In 
+bolus/infusion mode, you set the dose by selecting a bolus amount or 
+entering an infusion rate.  These modes can be toggled when the program 
+is operating.  Items 4 and 5 below are skipped if you select 
+bolus/infusion mode.
+
+4.	Target (plasma or effect site, or drug effect): If the 
+equilibration rate constant, ke0, is known, then the program will ask 
+whether you wish to target the plasma or the site of drug effect.  If a 
+full effect site model has been described (currently implemented for 
+muscle relaxants), then the program will also give you an option of 
+targeting the effect itself.
+
+5.	Target concentration or effect: This is the initial target the 
+program will attempt to achieve.  If you have selected plasma or effect 
+site, then you should enter the desired target concentration.  If you 
+have selected the effect itself, then you should enter the desired 
+effect you wish to target.  You cannot target the maximum effect, 
+because the concentration associated with the maximum effect is ¥.
+
+6.	Confirmation: STANPUMP will display your choices, as well as the 
+default infusate concentration, and ask for a confirmation of the data.
+
+7.	STANPUMP will ask for the name of the file to store the output 
+data.  The output files are discussed in Appendix II.  Only the first 8 
+characters of the name will be accepted, and any extension (e.g. 
+".dat.") will be ignored.  STANPUMP will automatically create the 
+extensions for the file names.
+
+8.	STANPUMP will ask for the name of the infusion pump.  Select 
+"simulation" to run with no pump attached.
+
+9.	If the Harvard Pump 22 has been selected, STANPUMP will ask for 
+the syringe type, and then enter a dialogue to purge the syringe and 
+tubing after it has been placed in the pump.
+
+10.	Once all questions have been answered, STANPUMP will display a 
+start-up screen, awaiting the keypress "1" to actually start the 
+infusion.  Thus, all the questions can be answered well before actually 
+beginning a STANPUMP infusion.
+
+11.	STANPUMP has several built in clinical trial protocols, which are 
+triggered by command line arguments. For example, the word "ICI" on the 
+command line triggers a specific series of questions relevant to 
+specific protocols, and that some of the queries shown above will be 
+bypassed.  A review of the command line arguments (Appendix I) will 
+demonstrate that many aspects of STANPUMP's performance can be altered 
+through the use of command line arguments.
+
+Control of the STANPUMP program
+
+Once the infusion has started, the operation of STANPUMP is controlled 
+by special function keys, as follows:
+
+	F1	Change desired concentration
+	F2	Change wake-up concentration
+	F3	Change syringe
+	F4	Enter measured plasma concentration
+	F5	Toggle real time and maximum speed simulations
+	F6	Toggle target and zero order infusion modes
+	F8	Toggle plasma and effect modes
+	F9	Toggle transport mode
+	F10	Terminate infusion
+
+Detailed description:
+
+	F1 will allow you to enter a new desired concentration.  This will 
+be the desired concentration in either the plasma or at the site of drug 
+effect, depending on which mode you are operating in.  The display will 
+indicate which mode you are in, by showing the desired concentration 
+opposite "plasma" or "effect site", respectively.  The pump will 
+continue infusing to the desired concentration while you are entering 
+the number.  There is no time limit on entry of the number, so you can 
+enter the desired concentration for an upcoming time point, and leave it 
+there until the moment you desire the change.  The pump responds 
+immediately to a change in the desired concentration when the "enter" 
+key is pressed.  If no number is entered, the desired concentration will 
+remain unchanged.
+
+	F2 will change the "look ahead" concentration.  The pump 
+constantly calculates the time required to drop to this concentration, 
+assuming that the infusion is terminated at the present time (i.e. the 
+desired concentration set to 0).  This allows you to look ahead and see 
+the amount of time required to achieve the wake up concentration if the 
+infusion was immediately discontinued.  Usually, the wake-up 
+concentration will be the concentration desired for awakening the 
+patient at the conclusion of the anesthetic, hence the term "look ahead" 
+concentration.  However, you can use this to predict the fall to any 
+concentration you are interested in.  If you press F2, and then press 
+"enter" without entering a number, the "wake-up" concentration will 
+remain unchanged.
+
+	F3 allows you to change the syringe.  This has only been 
+implemented for the Harvard Pump 22.  Changing the syringe includes a 
+dialogue for computer controlled purging of the syringe, to eliminate 
+any air or dead space in the tubing or mechanism.  The syringe size may 
+be changed when the syringe is changed.
+
+	F4 allows entry of measured plasma levels for Bayesian 
+forecasting.  The F4 key only appears on the menu when using a data set 
+for which Bayesian forecasting is implemented.  Currently, this is 
+limited to alfentanil (Maitre kinetics) and lidocaine (Vozeh kinetics).  
+After pressing F4, enter the time of the measurement, followed by the 
+measured concentration.  While Bayesian forecasting is in progress, 
+entering F4 will abort the Bayesian forecasting.  The last measurement 
+will be deleted from the list of measurements as well.
+
+	F5 allows toggling the simulation speed between real time and the 
+maximum speed of the computing hardware.  Using F5, one can simulate the 
+induction of anesthesia, then jump ahead to simulate the emergence.  
+Also, one can use F5 to simulate the results of a very long (multi-day) 
+infusion with STANPUMP.  F5 will not appear in the menu unless STANPUMP 
+is in simulation mode.
+
+	F6 toggles the pump between target mode (the default)  and a zero-
+order infusion mode in which the pump administers boluses and 
+continuous, constant rate infusions.  The mode is primarily offered to 
+permit users to perform simulations with STANPUMP.
+ 
+	F8 toggles the pump between targeting the plasma concentration, 
+targeting the effect site concentration, and targeting the effect itself 
+(provided a full effect model is programmed into the computer).  
+STANPUMP can be toggled between modes at any time.
+
+	F9 instructs the pump to enter "transport mode."  This allows the 
+pump to be disconnected from the computer for transport (without 
+electricity) to another site.  This mode is necessary because the 
+Harvard Pump 22 has no battery, and some of our studies involve using 
+the pump in the O.R., then maintaining the infusion in the Intensive 
+Care Unit.  The desired concentration is set to 0 when in transport 
+mode.  If the pump is in transport mode, then F9 instructs the pump to 
+resume serial communications.  This will include the full change 
+syringe/purging dialogue for the Harvard Pump 22, and include entering a 
+new desired concentration.
+
+	F10 terminates the infusion.  After pressing F10, the pump will 
+prompt you to either press "END" (on the numeric keypad) to actually 
+implement the termination or press F1 to return to normal pump function.  
+The pump will continue to function while you decide which button to 
+press.  The second step (pressing END) was added after I inadvertently 
+pressed F10 during a case, terminating the infusion well before I 
+intended to do so.
+
+	Lastly, Control-C, Control-Break, and Control-Alt-Delete will not 
+terminate the program once an infusion has started.  These keys have 
+been specifically disabled to prevent inadvertent termination of the 
+infusion.  You must use F10, as described above, to exit the STANPUMP 
+program.
+
+I suggest running the pump in simulation mode prior to clinical use.  
+Select the drug and the pharmacokinetic parameter set you wish to 
+infuse, then observe the rate and amount of drug administered by 
+STANPUMP.  Experiment with the differences between "plasma mode" and 
+"effect mode."  You will probably observe that the effect mode more 
+closely approximates how you would induce the anesthetic if you were 
+giving the drug without benefit of a computer controlled infusion.
+
+Practical Suggestions
+
+1.	Connect the infusion line to a t-piece immediately proximal to the 
+I.V. catheter.  This way, there is very little dead space between the 
+infusion line and the patient.  You would never attach a nitroprusside 
+infusion line to the carrier line 5 feet away from the patient, and the 
+same rationale applies when administering intravenous anesthetics.
+
+2.	Place a stopcock between the syringe and the infusion tubing.  In 
+the unlikely event that a runaway infusion occurs, the fastest way to 
+stop the pump is to just turn the stopcock.  Also, the stopcock is 
+useful for drawing up additional drug, which needs to be regularly done 
+if infusing propofol.  Purging the line, while still connected to the 
+patient, is also simplified by the presence of the stopcock.
+
+3.	Double check the syringe size.  There are many internal checks 
+within the STANPUMP program to prevent patients from receiving an 
+overdose.  However, STANPUMP will definitely give an overdose if you 
+tell STANPUMP that you have put in a small diameter syringe and actually 
+put in a large diameter syringe.  Thus, use particular care when 
+entering the syringe size into STANPUMP.  STANPUMP will ask you to 
+verify the syringe size.  Please do this deliberately and carefully when 
+you use the program.
+
+4.	STANPUMP under Windows 3.1. We have recently changed STANPUMP from 
+using polled serial communications to using the Greenleaf Serial 
+Communications drivers. The new serial drivers are interrupt-driven, 
+which makes them considerably more reliable than the previous polled 
+method.  Additionally, using the included Greenleaf virtual device 
+drivers, STANPUMP should operate reliably under Windows 3.1, even as a 
+background operation (provided background processing of the DOS window 
+has been enabled). 
+
+	To run under Windows, you need to include the following lines in 
+your [386Enh] section of the file “system.ini” located in your windows 
+directory:
+
+	device=c:\stanpump\vgfd.386
+	device=c:\stanpump\vgfcd.386
+
+	The files vgfd.386 and vgfcd.386 are on the STANPUMP diskette, and 
+are copied into the STANPUMP directory as part of the typical 
+installation.  The above assumes that the files vgfd.386 and vgfcd.386 
+are located in a directory “stanpump” located on your c: drive.  If 
+you have put them somewhere else, then you will need to modify the above 
+lines accordingly. 
+
+5.	Control-C, Control-N, Control-P, and Shift-PrtScr.  These special 
+control characters can cause problems for many DOS programs because they 
+are handled by the DOS keyboard interrupt.  STANPUMP modifies the 
+keyboard interrupt to screen out all control characters.  Thus, you 
+cannot use Control-C to abort the program.  You also cannot send the 
+screen contents to the printer with Control-N or Control-P.  This avoids 
+the lock-up which occurs if you inadvertently type Control-N or Control-
+P when there is no printer attached to the computer.  If you want to 
+abort STANPUMP prior to starting the infusion, press ESC (there is a 
+reminder on the screen to this effect).  Once the program has started, 
+use F10 to abort STANPUMP.  If STANPUMP should abort spontaneously by 
+some other mechanism, you should immediately reboot the computer, as the 
+keyboard interrupt will probably be corrupted.
+
+6.	80837 Coprocessor:  Every mathematics coprocessor is not 
+necessarily compatible with every implementation of the 80386 CPU.  For 
+example, the Everex Tempo laptop computers use a Chips and Technologies 
+80386 ChipSet which is not compatible with most Cyrix math coprocessors.  
+This will show up as error M1116 when STANPUMP is run.  If you choose to 
+install a math coprocessor on your computer (which is a good idea), 
+please run the diagnostic disk shipped with the coprocessor to verify 
+that the coprocessor is compatible with your 80386 prior to using 
+STANPUMP (or any other program).
+
+Bayesian forecasting
+
+Pierre Maitre, M.D. and I have recently incorporated Bayesian 
+forecasting into STANPUMP.  Bayesian forecasting is currently supported 
+for only two drugs: alfentanil (Maitre kinetics) and lidocaine (Vozeh 
+kinetics).  These two drugs were chosen because careful population 
+pharmacokinetic analyses have been published for them, and because they 
+tie into specific research programs.  
+
+When using Bayesian forecasting, the user measures plasma samples and 
+then enters the results into the computer.  The samples can be entered 
+at any time after the sample has been drawn, and need not be entered in 
+chronological order (although it makes sense to do so).  The user enters 
+the time of the sample, in minutes from the beginning of the infusion, 
+and the measured concentration.  Up to 60 observations can be entered.  
+After each observation, STANPUMP uses nonlinear regression to estimate 
+the individual patient's pharmacokinetic parameters.  The nonlinear 
+regression always starts with the original population estimates, and 
+then simultaneously minimizes both the squared error between the 
+measured and predicted concentrations, weighted by the expected variance 
+of the measurement, and the squared error between the original and 
+predicted pharmacokinetic parameters, weighted by the expected variance 
+of the parameter.  During and after the regression, STANPUMP displays 
+the measured and predicted concentrations for the last 20 observations 
+so the user can assess the goodness of fit.
+
+The F4 function key is used to enter measured concentrations.  The user 
+first enters the time of the measurement, followed by the actual 
+measured concentration.  If the time of the measurement is before the 
+time of a previous measurement, then the new observation will be 
+inserted into its proper position.  If the time of the measurement is 
+the same as the time of a previous measurement, then the measured 
+concentration of the previous measurement will be changed to the new 
+measured concentration.  If the time of the measured concentration is 
+the same as the time of a previous measurement and the measured 
+concentration is 0, then the previous measurement will be deleted.  If 
+several measurements are entered, and then all measurements are 
+subsequently deleted, STANPUMP will restore the original population 
+pharmacokinetics.
+
+The nonlinear regression and estimation of individual patient 
+pharmacokinetic values happens in real time, while the pump continues to 
+administer drug into the patient.  After the parameters are estimated, 
+STANPUMP reestimates the current predicted plasma and effect site 
+concentrations.  If the plasma and target concentrations were the same 
+at the beginning of the Bayesian update (i.e. the patient was at pseudo 
+steady-state), then STANPUMP will revise the target concentration to 
+agree with the new estimate.  This prevents STANPUMP either giving an 
+undesired bolus, or turning off the infusion (depending on whether the 
+revised kinetics lowered or raised the predicted concentration, 
+respectively) at the conclusion of the Bayesian forecasting.
+
+Bayesian forecasting is also implemented for feedback of the percent 
+neuromuscular blockade on the PK/PD model of muscle relaxants.  The 
+Bayesian algorithms are used to update the pharmacokinetic parameters 
+(V1 and clearance) based on the observed effect.  This is implemented 
+for the purpose of testing the utility of real-time Bayesian forecasting 
+based on measures of drug effect, which are often available, instead of 
+requiring entry of measured plasma concentrations, which are rarely 
+available.
+
+Cabling
+
+Most problems with STANPUMP have been caused by poor cabling between the 
+pump and the computer.  If the cable falls out or fails to transmit the 
+data between the pump and the computer, there is little the software can 
+do to correct the problem.  The proper cable can be found at virtually 
+any computer store, labeled as an "IBM AT-MODEM" cable.  If the cable is 
+screwed into the computer and the pump, this will assure that the pump 
+is not accidentally disconnected from the computer when using STANPUMP.
+
+Safety issues
+
+STANPUMP is a research program, not a commercial product.  As STANPUMP 
+is an experimental program, it should only be used as part of an 
+approved research protocol.  Additionally, patients should be made aware 
+that STANPUMP, in combination with the Harvard Pump 22, is an 
+experimental device that is not approved for human use.  I therefore 
+recommend that the experimental nature of STANPUMP be explicitly 
+mentioned in the informed consent.
+
+A recent survey of users indicates that there has been only one report 
+of an administration error causing an overdose of drug, and that was 
+with an earlier version of STANPUMP.  This happened five years ago at 
+Stanford in the first clinical trial with STANPUMP.  The overdose was 
+caused by the software not anticipating the influence of electrocautery 
+on the Harvard Pump 22.  Electrocautery can, on rare occasions, cause 
+the Harvard Pump to reset its internal memory and lose track of the 
+volume already infused.  STANPUMP has since been revised to recognize 
+this problem, reinitialize the Harvard pump, and restart the infusion.  
+Approximately 5 seconds of data are potentially lost when this error 
+occurs.  There have been no further cases of drug overdose in the four 
+years since this problem was addressed.
+
+Despite this excellent safety record, I recommend that the user of 
+STANPUMP regularly check the infusion rate and total dose administered.  
+However, I must emphasize that the response of STANPUMP to unexpected 
+situations is to shut down the pump, rather than risking an incorrect 
+infusion of drug.
+
+While the nature of computer software prevents my making any guarantees 
+on this point,  I am not aware of any bugs in the current software, 
+which has been extensively tested both in our laboratory and in many 
+clinical trials at Stanford and at other institutions.  Please get back 
+to me promptly if you encounter any problems with the software.  My 
+office number is (415) 852-3419.  My home telephone number is (415) 965-
+7450.  My FAX number is (415) 852-3414.  My e-mail address is 
+me.sls@forsythe.stanford.edu.  In emergencies, I can usually be reached 
+on my pager (415-723-8222, pager: 3477) or via my pocket cellular phone: 
+415-722-7840.  Of the above, e-mail works the best.
+Lastly, the computer on which STANPUMP has been developed is regularly 
+screened for viruses.  This workstation has never been infected by a 
+virus, and STANPUMP copies obtained directly from me have never been 
+contaminated with viral code. 
+
+Conclusion
+
+I welcome suggestions for improvements to STANPUMP.  Other drugs or 
+kinetic sets can be easily added.  Pump drivers are difficult to 
+program, so I am not anxious to add a lot of additional pumps.  If there 
+is a pump which is particularly attractive because of either size, 
+price, or convenience, then I would be willing to program STANPUMP to 
+drive the device.  However, I need both the pump communication 
+documentation and the actual pump  to write the drivers.
+
+Thank you for your interest with STANPUMP.  I hope it is a useful 
+adjunct to your research program.
+
+
+
+
+
+
+
+ Appendix I: Command Line Arguments
+
+STANPUMP can accept command line arguments for virtually every parameter 
+affecting pump performance.  If you wish, you can make a batch file to 
+process STANPUMP in a mode you commonly use.  This avoids having to go 
+through the initial menu each time you use the program.  This is 
+especially useful if you are doing studies with STANPUMP.  The command 
+line arguments are listed below.  Note that STANPUMP usually does not 
+look for the entire argument name.  Instead, it looks only at the first 
+few characters.  The minimum text required to recognize each command is 
+listed in [brackets] following each command line argument.  You may use 
+either the full text, for clarity, or the abbreviated text for 
+simplicity.  Command line arguments may be typed in either upper or 
+lower case.  You may use as few or as many arguments as you wish.  The 
+arguments are:
+ 
+	simulation 			[sim] 
+		Places the pump in simulation mode.
+ 
+	weight {number}		[wei] 
+	Sets the patient's weight.  The weight must be between .01 and 300 
+kg.  If no number is specified, the weight parameter is ignored and the 
+user will be asked for a weight.
+ 
+	delta {number}		[del] 
+	Sets the number of seconds between pump updates.  Delta must be 
+between 10 and 60 seconds.  If no number is specified, the delta 
+parameter is ignored, and the system will default to 10 seconds.
+ 
+	desired {number}		[des] 
+	Sets the desired concentration.  If no number is specified, the 
+parameter is ignored and the user will be asked for the desired 
+concentration.
+ 
+	concentration {number}	[con] 
+	Sets the infusate concentration. If no number is specified, the 
+parameter is ignored.  For all drugs preprogrammed into STANPUMP, the 
+default infusate concentration is the concentration of the undiluted 
+drug.  
+
+	file {string}			[file] 
+	Sets the output file to {string}.  If no output file is specified, 
+the command is ignored and the user will be asked for an output file.
+ 
+	kinetics {string} 		[kin]
+	Sets the pharmacokinetic parameters to that specified by the file 
+{string}.  If no file is specified, the command is ignored. This is the 
+command to use to enter your own drugs or parameters into STANPUMP 
+without recompiling the program.  See below for the argument list for 
+the pharmacokinetic input file 
+ 
+	fentanyl			[fen] 
+		Specifies that the drug is fentanyl 
+		May be followed by: 
+			Hug		(McClain and Hug Parameters) 	[hug] 
+			Scott		(Scott and Stanski Parameters) 	[sco]
+ 			Shafer		(Shafer parameters)		
+	[sha] 
+ 
+	alfentanil			[alf] 
+		Specifies that the drug is alfentanil 
+		May be followed by: 
+			Sco1		(Scott parameters, not wt adjusted)	[sco1]
+			Sco2		(Scott parameters, weight adjusted) 
+	[sco2]
+			Maitre		(Maitre parameters) 		
+	[mai] 
+			Hudson	(Hudson parameters) 			[hud] 
+					-not presently specified 
+			Gor1		(Goresky parameters, < 1 year) 	[gor1] 
+			Gor2		(Goresky parameters, 1-18 years) 	[gor2] 
+ 
+	sufentanil			[suf] 
+		Specifies that the drug is sufentanil 
+		May be followed by: 
+			Hudson	(Hudson parameters)			[hud] 
+			Bovill		(Bovill parameters)		
+	[bov] 
+ 
+	dexmedetomidine		[dex] 
+		Specifies that the drug is dexmedetomidine 
+		No specific kinetic set on the command line  
+ 
+	thiopental			[thi] 
+		Specifies that the drug is thiopental 
+		May be followed by: 
+			Hum1		(human parameters) 			[hum1] 
+			Hum2		(human parameters) 			[hum2] 
+						-presently all 0s!
+			rats		(second rat parameters)	 	[rats] 
+ 
+	midazolam			[mid] 
+		Specifies that the drug is midazolam 
+	Only 1 kinetic set in program (Greenblatt's), so no specific 
+kinetic set on the command line.
+ 
+	diazepam			[dia] 
+		Specifies that the drug is diazepam 
+	Only 1 kinetic set in program (Greenblatt's), so no specific 
+kinetic set on the command line.
+
+	propofol			[pro]
+		Specifies that the drug is propofol 
+		May be followed by:
+			gepts		(gepts' kinetics, as cited by		[gep]
+					Glass and Jacobs)
+			shafer		(Shafer/Dyck kinetics)		[sha]
+
+	lidocaine			[lido]
+		Specifies that the drug is lidocaine.
+		May be followed by:
+			rowland	(Rowland's kinetics)			[row]
+			vozeh		(Vozeh's kinetics)			[voz]
+
+	ketamine			[ket]
+	Specifies that the drug is ketamine.  You will be asked to select 
+between human and horse pharmacokinetic parameter sets, as appropriate 
+to the clinical situation.
+ 
+	methohexital			[meth]
+	Specifies that the drug is methohexital.  Only 1 kinetic set 
+(Hudson's) in program.
+ 
+	etomidate			[etom]
+	Specifies that the drug is methohexital.  Only 1 kinetic set 
+(Arden's) in program.
+ 
+	effect				[eff] 
+		Specifies to come up in effect mode. 
+ 
+	plasma				[pla] 
+		Specifies to come up on plasma mode. 
+ 
+	c2				[c2] 
+		Specifies IMED C2 protocol 
+ 
+	c2simulator			[c2sim] 
+	Specifies use of IMED C2 simulator, which annoyingly has a 
+slightly different command set than the C2 pump it is intended to 
+simulate! 
+ 
+	harvard			[har] 
+		Specifies harvard pump 22 
+		The following syringes may be specified for the harvard 
+pump: 
+			bd5		Becton-Dickinson 5 ml	[bd5] 
+			bd10		Becton-Dickinson 10 ml	[bd10] 
+			bd20		Becton-Dickinson 20 ml	[bd20]
+			bd30		Becton-Dickinson 30 ml	[bd30]
+			bd60		Becton-Dickinson 60 ml  	[bd60] 
+			mj6		Monoject 6 ml			[mj6] 
+			mj12		Monoject 12 ml		[mj12]
+			mj20		Monoject 20 ml		[mj20]
+			mj35		Monoject 35 ml		[mj35] 
+			mj60		Monoject 60 ml		[mj60] 
+			h5		Hamilton 5ml Glass		[h5] 
+			volume {number}				[vol] 
+				Specifies volume currently in syringe 
+				Volume ignored if no number is specified 
+
+		You can also specify your own syringe type using the keyword 
+"syringe"
+
+	syringe {name} {internal diameter} {maximum volume}  [syr]
+
+	This sets a new syringe type for the harvard pump 22.  The {name} 
+is the text name for the syringe.  If you want an included space or 
+comma, then enclose the name in quotes (e.g. "New Syringe Type").  The 
+internal diameter is the diameter of the syringe in millimeters.  The 
+volume is the maximum capacity of the syringe.  All three parameters 
+must be specified, or the syringe command line argument will be ignored.
+
+	onetype
+	Specifies that the syringe type, once set, will not change over 
+the course of the study.
+
+	gibbs
+	Causes a brief precalculation of infusion rates prior to reading 
+pump volume.  This nearly eliminates the very small overshoot when 
+raising concentrations caused by the delay between when the pump reads 
+the concentration infused from the pump and when it sends out the next 
+rate.  However, it increases the size of the output file.
+ 
+	com1, com2, com3, or com4
+	Specifies that the communications port is com1, com2, com3, or 
+com4, respectively.  Com1 is assumed if no port is specified.
+
+	address
+	Address of the communications port.  This allows for nonstandard 
+ports to be used for the serial communication.
+
+	study				[study] 
+		Specifies Hudson Study Protocol.  Should only be used by Bob 
+Hudson.
+
+	prior				[prior]
+	Specifies that drug was given prior to running STANPUMP.  Stanpump 
+will ask for the details of prior administration, which will be modeled, 
+prior to starting its own infusion.
+
+	reproduce			[repro]
+	Specifies that STANPUMP is to reproduce a prior run.  Reproduce 
+must be followed by a file name, which is the output file (with the .DAT 
+extension) from a previous STANPUMP run.
+
+	track				[track]
+	STANPUMP will track a set of targets specified on a disk file.  
+The disk file should be an ASCII file with time and targets specified.  
+Each line should have the time, a space, tab, or comma, followed by the 
+desired target at that time.
+
+	debug				[debug]
+	STANPUMP will display debugging information as it runs.  Can be 
+fairly spectacular.
+
+	quick				[quick]
+		STANPUMP will bypass the confirmation displays during setup.
+
+	delete				[delete]
+	STANPUMP will automatically delete old files if the name conflicts 
+with a new file name.  This bypasses the default dialogue about whether 
+the user wants old files with the same name as new files to be deleted.
+
+	ici				[ici]
+	STANPUMP enters the mode required for the ICI/Stuart 
+Pharmaceuticals multicenter trial.
+
+	bard				[bard]
+	STANPUMP will perform simulations using the maximum rates of the 
+BARD InfusO.R. pump for fentanyl, alfentanil, sufentanil, propofol, 
+vecuronium, and atracurium.
+
+For example, the command line:
+
+		stanpump fentanyl hug weight 85 desired 15 harvard bd60 40 
+file study01
+
+is equivalent to:
+
+		stanpump fen hug wei 85 des 15 har bd60 file study01
+
+and will start up STANPUMP, automatically defaulting to a fentanyl 
+infusion using McClain and Hug's pharmacokinetic parameters for an 85 kg 
+patient, with an initial targeted plasma concentration of 15 ng/ml, 
+using a harvard infusion pump loaded with a 60 ml Becton-Dickinson 
+syringe.  The output files will be study01.dat and study01.drg.
+
+The command line is interpreted prior to the initial questions.  After 
+selecting the kinetics, blood levels, etc, the computer will ask for a 
+confirmation.  If you select "2" (which means you don't confirm the 
+selections) then the computer will ignore the command line arguments and 
+restore all default values.  This allows you to correct inaccurate 
+command lines while running the program.
+ Appendix II: Output Files
+
+STANPUMP creates output files as it runs.  The first file ends with the 
+extension ".DAT".  This file is an ASCII account of what STANPUMP did 
+every few seconds.  This file constitutes the main record of STANPUMP's 
+activities during each study, and should be permanently stored as part 
+of the research documentation.
+
+Each line of the file has three numeric arguments.  The first argument 
+is a flag, the second is the time (in seconds) since the beginning of 
+the infusion.  The third argument varies depending on the flag.  The 
+interpretation of the third argument is as follows:
+
+		Flag		Third Argument
+		1		Volume infused up to that time point
+		2		Rate requested from the pump (mls/hr) at that 
+time point
+		3		Predicted plasma drug concentration at that time 
+point
+		4		Predicted effect site concentration at that time 
+point
+
+Every time STANPUMP updates the pump rate, a new set of arguments is 
+printed out.  
+
+To prepare graphs from STANPUMP, load the .DAT file into EXCEL.  The 
+fields in the .DAT files are separated by commas, so prior to opening 
+the file, click on "Text", and "Comma" in the file open dialog box.  
+After the file is open, sort the data by field 1 (flag), then field 2 
+(time, in seconds).  You can then add a fourth column to convert the 
+time from seconds to minutes, hours, days, or whatever units you wish to 
+display.  Then, prepare a graph of time vs the value (third column) for 
+whatever portion of the data (volume, rate, plasma concentration, or 
+effect site concentration, as indicated by the flag in column 1) that 
+interests you.
+
+Another way of obtaining files for making attractive graphs is to run 
+the program DATFILES, which is also included on the installation 
+diskette.  To run the DATFILES program, type “DATFILES,” followed by 
+the name of the .dat file, the name of an output file for the graph (any 
+legal DOS filename), and a number indicating how compressed you want the 
+output file to be.  For example, assume the .dat file created by 
+STANPUMP is called “mystudy.dat”.  The following command would create 
+an ASCII file appropriate for making graphs called mystudy.gra with a 
+compression factor of 1%:
+
+	datfiles   mystudy.dat    mystudy.gra    1
+
+If mystudy.gra proved to be too big, you could create a file showing the 
+same information, but with somewhat lower resolution, using the command:
+
+	datfiles   mystudy.dat    mystudy.gra    5
+
+The file “mystudy.gra” would have about 1/5th as many lines with a 
+compression factor of 5% as the file created with a compression factor 
+of 1%.  You can experiment with the compression factor to create a file 
+with satisfactory resolution of your study that is not so large as to be 
+difficult to process with your graphics program.
+
+The output file created by DATFILES (mystudy.gra in the above example) 
+is a comma separated file organized as minutes from start of the 
+STANPUMP study, true time, plasma concentration, effect site 
+concentration, pump rate (mls/hr), and cumulative mls infused. It can 
+easily be loaded into most programs as a comma delimited file. 
+Additionally, Excel directly recognizes the date/time format.
+
+STANPUMP also creates a file ending with the extension ".DRG".  This 
+file is a compressed infusion function which we use when using nonlinear 
+regression of computer controlled drug delivery.  The first line, "9999 
+0" specifies that no boluses were given (our regression software will 
+process either boluses or infusion, with boluses listed first).  
+Subsequent lines show a consecutive listing of infusions, starting with 
+time on (min), time off (min), and rate (units/min).  The last infusion 
+is 9999 9999 0, which is, again, a flag to our nonlinear regression 
+software that there are no more infusions to process.
+
+STANPUMP creates a file with the extension ".ERR".  This is a file 
+showing errors and warnings from STANPUMP during operation.  It can 
+generally be ignored unless problems are encountered, in which case it 
+may be quite useful.
+
+STANPUMP creates a file with the extension ".cmm".  It is a detailed 
+record of every communication between STANPUMP and the pump.  This file 
+can also be ignored unless problems are encountered, in which case it 
+may be useful.
+
+STANPUMP creates a file with the extension “.pk”.  This is a file that 
+shows, first, the details of the stanpump run (subject name, drug, 
+parameter set, infusate concentration). It then shows the details of the 
+pharmacokinetic model used by STANPUMP for the run. 
+
+To summarize, the files which end with “.dat”, “.drg", and “.pk” 
+should be saved, as these files will permit reconstruction of the 
+precise dosing regimen administered to the patient.  The files which end 
+with ".err" and ".cmm" can be erased following each study, provided that 
+no unanticipated problems arose.
+ Appendix III: External Parameter File
+
+STANPUMP can read all of the pharmacokinetic parameters from an external 
+file, rather than require that the parameters be compiled into the 
+program.  The file can only be accessed by a command line argument: 
+
+	kinetics: {file} 
+
+where {file} is the name of the disk file.  If the disk file cannot be 
+found, the program will abort.  The format for the file is shown below.  
+Note that each item must be on its own line, and items 1, 2, and 3 may 
+not contain imbedded spaces.  If the flags are not set to 0 or 1, the 
+results are not predictable.  The usual text for species identification 
+is "Patient", but you may put whatever you like.  The disk includes a 
+file "sample.kin" showing how this file should be structured.
+
+	Pharmacokinetic File Format: 
+			Line		Description 
+			1		drug name 
+			2		parameter name 
+			3		species identification 
+			4		units flag: (for display purposes only) 
+						0: 	plasma: 		ng/ml
+							infusate:		ug/ml
+						1:	plasma:		ug/ml
+							infusate:		mg/ml
+			5		Effect Flag: 
+						0 = no effect data 
+						1 = effect data 
+			6		Weight Scale Flag 
+						0 = don't scale vc to weight 
+						1 = scale vc to weight 
+			7		infusate concentration
+						(in units, as above, per ml) 
+			8		maximum permissible concentration 
+			9		desired awakening concentration 
+			10		maximum rate (in infusate units/kg/min)
+ 			11		vc (liters)
+			12		k10 (/minute)
+			13		k12 (/minute)
+			14		k13 (/minute)
+			15		k21 (/minute)
+			16		k31 (/minute)
+			17		ke0 (/minute)
+			Item 17 can be omitted if the effect flag = 0; 
+
+For example:
+
+		stanpump kinetics myown.kin weight 85 desired 15 harvard 
+bd60 40 file study01
+
+will start up STANPUMP, automatically reading in the pharmacokinetic 
+parameters from myown.kin.  As in the previous example, the weight will 
+be set to 85 kg, with an initial targeted plasma concentration of 15, 
+using a harvard infusion pump loaded with a 60 ml Becton-Dickinson 
+syringe that has 40 mls of drug in it.  The output file created by 
+STANPUMP will be study01.dat.
+
+You could also just say:
+
+		stanpump kinetics myown.kin
+
+and STANPUMP would use the pharmacokinetics from myown.kin, but would 
+still ask you for the weight, desired concentration, type of pump used, 
+type of syringe, etc.
+
+STANPUMP can easily handle drugs described by only 1 or 2 compartment 
+models.  For a 2 compartmental model, just set k13 and k31 to 0.  For a 
+1 compartment model, also set k12 and k21 to 0.  In a 1 compartment 
+model, k10 is then the same as the elimination rate constant.
+

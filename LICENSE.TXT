@@ -1,0 +1,8 @@
+STANPUMP is available, at no charge, to interested investigators and
+anesthesiologists. You may share the STANPUMP software with any
+interested persons. My only request is that any manuscripts based upon
+work with STANPUMP acknowledge, either in the Methods or following the
+Discussion, the source of STANPUMP with a statement to the effect that
+STANPUMP is freely available from the author at:
+
+http://opentci.org/code/stanpump

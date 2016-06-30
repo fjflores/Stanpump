@@ -1,0 +1,5 @@
+# Extensions to ignore:
+*.doc
+*.exe
+*.tar
+*.386
